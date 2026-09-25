@@ -4,9 +4,20 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        COMMUNITY_BRANCH_PLUGIN_VERSION: 1.6.0
-    image: ebc/sonarqube-multibranch:8.6.1
-    expose:
-      - 9000
+        SONARQUBE_VERSION: ${SONARQUBE_VERSION:-26.5.0.122743-community}
+        COMMUNITY_BRANCH_PLUGIN_VERSION: ${COMMUNITY_BRANCH_PLUGIN_VERSION:-26.5.0}
+
+    image: 0niStack/sonarqube-multibranch:26.5.0
+
     ports:
-      - "127.0.0.1:9000:9000"
+      - "9000:9000"
+
+    volumes:
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_extensions:/opt/sonarqube/extensions
+      - sonarqube_logs:/opt/sonarqube/logs
+
+volumes:
+  sonarqube_data:
+  sonarqube_extensions:
+  sonarqube_logs:
