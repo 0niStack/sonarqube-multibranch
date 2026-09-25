@@ -1,0 +1,12 @@
+services:
+  sonarqube:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        COMMUNITY_BRANCH_PLUGIN_VERSION: 1.6.0
+    image: ebc/sonarqube-multibranch:8.6.1
+    expose:
+      - 9000
+    ports:
+      - "127.0.0.1:9000:9000"
