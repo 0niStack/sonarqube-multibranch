@@ -12,5 +12,5 @@ FROM sonarqube:8.6.1-community
 ARG COMMUNITY_BRANCH_PLUGIN_VERSION
 COPY --from=downloader /plugin/sonarqube-community-branch-plugin.jar /opt/sonarqube/extensions/plugins/sonarqube-community-branch-plugin-${COMMUNITY_BRANCH_PLUGIN_VERSION}.jar
 COPY --from=downloader /plugin/sonarqube-community-branch-plugin.jar /opt/sonarqube/lib/common/sonarqube-community-branch-plugin-${COMMUNITY_BRANCH_PLUGIN_VERSION}.jar
-RUN printf 'sonar.web.javaAdditionalOpts=-javaagent:./extensions/plugins/sonarqube-community-branch-plugin-%s.jar=web\nsonar.ce.javaAdditionalOpts=-javaagent:./extensions/plugins/sonarqube-community-branch-plugin-%s.jar=ce\n' \
-    "$COMMUNITY_BRANCH_PLUGIN_VERSION" "$COMMUNITY_BRANCH_PLUGIN_VERSION" > /opt/sonarqube/conf/sonar.properties
+# No sonar.properties / javaagent needed for this plugin version (1.6.0) —
+# that mechanism was only introduced in later plugin releases (~1.9.0+).
