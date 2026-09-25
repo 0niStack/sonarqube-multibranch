@@ -32,14 +32,18 @@ jobs:
 
       - name: Show versions
         run: |
-          echo "SonarQube: ${SONARQUBE_VERSION}"
-          echo "Community Branch Plugin: ${COMMUNITY_BRANCH_PLUGIN_VERSION}"
+          echo "SonarQube version: ${SONARQUBE_VERSION}"
+          echo "Community Branch Plugin version: ${COMMUNITY_BRANCH_PLUGIN_VERSION}"
 
       - name: Build image
         run: |
           docker compose build \
             --build-arg SONARQUBE_VERSION="${SONARQUBE_VERSION}" \
             --build-arg COMMUNITY_BRANCH_PLUGIN_VERSION="${COMMUNITY_BRANCH_PLUGIN_VERSION}"
+
+      - name: Verify local image
+        run: |
+          docker images | grep sonarqube-multibranch
 
       - name: Set vm.max_map_count for Elasticsearch
         run: sudo sysctl -w vm.max_map_count=262144
@@ -65,9 +69,9 @@ jobs:
           docker compose logs sonarqube
           exit 1
 
-      - name: Verify SonarQube version
-        run: |
-          curl -fsS http://127.0.0.1:9000/api/system/status
+      - name: Show SonarQube logs
+        if: always()
+        run: docker compose logs sonarqube
 
       - name: Tear down
         if: always()
@@ -84,10 +88,19 @@ jobs:
       - name: Tag and push image
         if: github.event_name != 'pull_request'
         run: |
-          IMAGE_ID="${REGISTRY}/$(echo ${IMAGE_NAME} | tr '[:upper:]' '[:lower:]')"
+          IMAGE_ID="${REGISTRY}/$(echo "${IMAGE_NAME}" | tr '[:upper:]' '[:lower:]')"
 
-          docker tag ebc/sonarqube-multibranch:26.5.0 "${IMAGE_ID}:26.5.0"
-          docker tag ebc/sonarqube-multibranch:26.5.0 "${IMAGE_ID}:latest"
+          echo "Pushing:"
+          echo "${IMAGE_ID}:26.5.0"
+          echo "${IMAGE_ID}:latest"
+
+          docker tag \
+            0niStack/sonarqube-multibranch:26.5.0 \
+            "${IMAGE_ID}:26.5.0"
+
+          docker tag \
+            0niStack/sonarqube-multibranch:26.5.0 \
+            "${IMAGE_ID}:latest"
 
           docker push "${IMAGE_ID}:26.5.0"
           docker push "${IMAGE_ID}:latest"
